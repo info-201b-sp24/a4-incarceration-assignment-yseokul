@@ -1,0 +1,86 @@
+---
+title: "Incarceration Trends in the U.S."
+author: "Yoonseo Nam"
+date: "2024-05-23"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(dplyr)
+library(leaflet)
+library(tidyr)
+```
+
+# **Introduction**
+The United States has the highest incarceration rate in the world, with a disproportionate impact on people of color, especially Black Americans. Over the past few decades, the prison and jail populations in the U.S. have surged, reflecting systemic issues rooted in both historical and present-day racism. Understanding the trends in incarceration rates over time, particularly in relation to race and gender, is crucial for identifying areas of concern and potential solutions.
+
+This report uses data from the Vera Institute to analyze incarceration trends in the U.S. By examining variables such as jail population, time (years), and race, we aim to uncover patterns of inequality and shed light on the factors contributing to these disparities. Through data visualization and analysis, this report provides insights that can inform policy decisions and increase public awareness.
+
+## Description of the Variables
+
+### Jail Population (total_jail_pop):
+
+This variable represents the total number of people incarcerated in jails across different states and years. Analyzing the jail population helps us understand the scale and trends of incarceration over time.
+
+### Time (year):
+
+The year variable indicates the specific year for which the jail population data is recorded. Examining trends over time allows us to see how the incarceration rates have changed across different periods, highlighting any significant increases or decreases.
+
+### Race (black_jail_pop, white_jail_pop, hispanic_jail_pop):
+
+These variables represent the jail populations broken down by racial groups: Black, White, and Hispanic. Analyzing these variables helps us understand racial disparities in incarceration rates. Given the historical context of racial discrimination in the U.S., these variables are crucial for highlighting systemic inequalities.
+
+### State:
+
+The state variable indicates the U.S. state for which the data is recorded. Analyzing data by state helps us identify geographical variations in incarceration rates, which can be influenced by state-specific policies and practices.
+By focusing on these variables, we aim to provide a comprehensive analysis of incarceration trends, emphasizing the impact of race and geographical differences. This approach will help identify patterns and potential areas for intervention to address the inequalities in the U.S. criminal justice system.
+
+# **Dataset**
+jail_pop_data <- read.csv("/Users/yoonseonam/Documents/Info201code/a4-incarceration-assignment-yseokul/us_jail_pop_data.csv")
+
+Number of records
+nrow(jail_pop_data)
+
+Column data
+str(jail_pop_data)
+
+
+# **Trend Analysis: Incarceration Rates Over Time**
+
+## Group populations by first variable
+yearly_inc_rates <- jail_pop_data %>%
+  group_by(year) %>%
+  summarise(total_jail_pop = sum(total_jail_pop, na.rm = TRUE))
+
+## Population trend analysis line chart 
+ggplot(yearly_inc_rates, aes(x = year, y = total_jail_pop)) +
+  geom_line() +
+  labs(title = "Total Jail Population Over Time", x = "Year", y = "Total Jail Population")
+  
+  
+# **Comparative Analysis: Jail Population By Race Over Time**
+
+## Comparing jail population by race over time 
+race_data <- jail_pop_data %>%
+  select(year, black_jail_pop, white_jail_pop) %>%
+  group_by(year) %>%
+  summarise(
+    black_jail_pop = sum(black_jail_pop, na.rm = TRUE),
+    white_jail_pop = sum(white_jail_pop, na.rm = TRUE),
+) %>%
+pivot_longer(cols = -year, names_to = "race", values_to = "total_jail_pop")
+
+## Jail population trends by race comparative line chart
+ggplot(race_data, aes(x = year, y = total_jail_pop, color = race))
+  geom_line() +
+  labs(title = "Jail Population Trends by Race Over Time", x = "Year", y = "Total Jail Population")
+  
+# **Geographical Analysis:**
+
+## Organized data by state
+state_data <- jail_pop_data %>%
+  group_by(state) %>%
+  summarise(total_jail_pop = sum(total_jail_pop, na.rm = TRUE))
+
