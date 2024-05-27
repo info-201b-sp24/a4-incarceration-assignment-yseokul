@@ -14,28 +14,37 @@ library(tidyr)
 ```
 
 # **Introduction**
-The United States has the highest incarceration rate in the world, with a disproportionate impact on people of color, especially Black Americans. Over the past few decades, the prison and jail populations in the U.S. have surged, reflecting systemic issues rooted in both historical and present-day racism. Understanding the trends in incarceration rates over time, particularly in relation to race and gender, is crucial for identifying areas of concern and potential solutions.
+The United States has the highest incarceration rate in the world, significantly impacting people of color, particularly Black Americans. This phenomenon is a consequence of both historical and contemporary racism, manifesting in disproportionately high incarceration rates for these communities. To comprehend the breadth and depth of this issue, it's essential to analyze the trends in incarceration rates over time, considering factors such as race, gender, and geography.
 
-This report uses data from the Vera Institute to analyze incarceration trends in the U.S. By examining variables such as jail population, time (years), and race, we aim to uncover patterns of inequality and shed light on the factors contributing to these disparities. Through data visualization and analysis, this report provides insights that can inform policy decisions and increase public awareness.
+This report leverages data from the Vera Institute to examine these trends and disparities in U.S. incarceration rates. By focusing on variables such as jail population, time (year), and race, we aim to illuminate patterns of inequality and provide insights for potential policy interventions and public awareness initiatives.
 
 ## Description of the Variables
 
-### Jail Population (total_jail_pop):
+In our analysis, we focus on the following key variables:
 
-This variable represents the total number of people incarcerated in jails across different states and years. Analyzing the jail population helps us understand the scale and trends of incarceration over time.
+### Total Jail Population (total_jail_pop):
 
-### Time (year):
+**Measure of Incarceration**: This variable represents the aggregate number of people incarcerated in jails within various states and over different years.
+**Significance**: Analyzing the total jail population provides a comprehensive view of the scale of incarceration. It helps identify overall trends and patterns, such as increases or decreases in the jail population over time.
 
-The year variable indicates the specific year for which the jail population data is recorded. Examining trends over time allows us to see how the incarceration rates have changed across different periods, highlighting any significant increases or decreases.
+### Year (year):
 
-### Race (black_jail_pop, white_jail_pop, hispanic_jail_pop):
+**Measure of Time**: The year variable indicates the specific year for which the jail population data is recorded.
+**Significance**: Examining trends over time allows us to observe how incarceration rates have evolved. This temporal analysis can reveal significant shifts in policy impacts or social dynamics affecting incarceration rates.
 
-These variables represent the jail populations broken down by racial groups: Black, White, and Hispanic. Analyzing these variables helps us understand racial disparities in incarceration rates. Given the historical context of racial discrimination in the U.S., these variables are crucial for highlighting systemic inequalities.
+### Race (e.g., black_jail_pop, white_jail_pop, hispanic_jail_pop):
 
-### State:
+**Measure of Demographic Disparity**: These variables represent the jail populations broken down by racial groups: Black, White, and Hispanic.
+**Significance**: Analyzing these variables is crucial for understanding racial disparities in incarceration rates. Given the historical and systemic nature of racial discrimination in the U.S., these variables highlight how different communities are affected by incarceration policies.
 
-The state variable indicates the U.S. state for which the data is recorded. Analyzing data by state helps us identify geographical variations in incarceration rates, which can be influenced by state-specific policies and practices.
-By focusing on these variables, we aim to provide a comprehensive analysis of incarceration trends, emphasizing the impact of race and geographical differences. This approach will help identify patterns and potential areas for intervention to address the inequalities in the U.S. criminal justice system.
+### State (state):
+
+**Geographical Measure**: The state variable indicates the U.S. state for which the data is recorded.
+**Significance**: Analyzing data by state helps identify geographical variations in incarceration rates. State-specific policies and practices can significantly influence these rates, making this variable essential for a localized understanding of incarceration trends.
+
+
+By focusing on these variables, this report provides a detailed analysis of incarceration trends, emphasizing the impact of race and geographical differences. This approach will help identify patterns and potential areas for intervention, addressing the inequalities within the U.S. criminal justice system. Through visualizations and data analysis, we strive to shed light on systemic issues and contribute to informed discussions on policy reforms.
+
 
 # **Dataset**
 jail_pop_data <- read.csv("/Users/yoonseonam/Documents/Info201code/a4-incarceration-assignment-yseokul/us_jail_pop_data.csv")
