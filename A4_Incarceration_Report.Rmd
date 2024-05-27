@@ -94,31 +94,31 @@ racial_disparities_2018 <- racial_disparities_2018 %>%
 
 # **Dataset Description**
 
-## Who collected the data?
+### Who collected the data?
 The data was collected by the Vera Institute of Justice, an organization known for its research and advocacy in criminal justice reform.
 
-## How was the data collected or generated?
+### How was the data collected or generated?
 The data was aggregated from various sources, including government reports, official jail records, and administrative data from county and state correctional facilities. The Vera Institute compiled these records to create a unified dataset that reflects the jail populations at different times and across different jurisdictions.
 
-## Why was the data collected?
+### Why was the data collected?
 The primary purpose of collecting this data was to shed light on the scope and scale of incarceration in the United States. By providing detailed information on jail populations, the Vera Institute aims to support research and advocacy efforts aimed at reducing mass incarceration and addressing systemic racial disparities in the justice system.
 
-## How many observations (rows) are in the data?
+### How many observations (rows) are in the data?
 The dataset contains approximately 153,811 observations (rows).
 
 nrow(us_jail_pop_data)
 
-## How Many Features (Columns) Are in the Data?
+### How Many Features (Columns) Are in the Data?
 The dataset includes 28 features (columns).
 
-## Ethical Questions or Questions of Power
+### Ethical Questions or Questions of Power
 Working with this data requires careful consideration of ethical questions and power dynamics. Key issues include the potential for misuse of the data to reinforce negative stereotypes or justify punitive policies. It is also important to consider the privacy and rights of incarcerated individuals, as their data should be handled with sensitivity and confidentiality. Researchers must ensure that their analysis and interpretation do not inadvertently perpetuate biases or contribute to the stigmatization of marginalized communities.
 
-## Possible Limitations
+### Possible Limitations
 Some records may have missing or incomplete data, which can affect the accuracy and reliability of the analysis. Certain counties or states may have inconsistent reporting practices, leading to gaps in the data. Another limitation is the way racial and ethnic categories are defined and recorded as they may not capture the full complexity of individuals' identities. This can lead to oversimplified or misleading conclusions about racial disparities.
 
 
-# **Dataset**
+### **Dataset**
 jail_pop_data <- read.csv("/Users/yoonseonam/Documents/Info201code/a4-incarceration-assignment-yseokul/us_jail_pop_data.csv")
 
 Number of records
@@ -129,6 +129,8 @@ str(us_jail_pop_data)
 
 
 # **Trend Analysis: Jail Population Trends Over Time by Race**
+
+![trend analysis](NEW_trend_analysis_chart.png)
 
 > This chart helps identify how the jail populations for different racial groups have changed over time. Patterns of racial disparities in incarceration rates can be observed, showing higher rates among marginalized communities compared to the White population. This trend analysis helps visualize the racial disparity as well as the stark contrasts in population differences.
 
@@ -164,7 +166,9 @@ ggplot(race_data_long, aes(x = year, y = total_jail_pop, color = race)) +
     )
 
   
-# **Comparative Analysis: Relationship Between Total Jail Population and Black Jail Population*
+# **Comparative Analysis: Relationship Between Total Jail Population and Black Jail Population**
+
+![comparative analysis](NEW_Comparative_Analysis_Scatterplot.png)
 
 > The variable comparison chart, which compares the total jail population and the Black jail population using a scatter plot, was designed to reveal potential disparities in incarceration rates between the overall population and specific racial groups. There is a clear positive correlation, indicating that as the total jail population increases, the Black jail population also increases. This can highlight the proportional representation of Black individuals in the overall jail population.
 
@@ -186,39 +190,40 @@ ggplot(scatter_data, aes(x = total_jail_pop, y = black_jail_pop)) +
   
 # **Geographical Analysis:**
 
+![map](NEW_Latinx_geographical_map.png)
 > Analyzing incarceration rates, particularly among specific demographic groups like Latinx individuals, is crucial for understanding systemic inequalities within the criminal justice system and identifying areas for reform. By visualizing Latinx incarceration rates by state, we can discern patterns that may reflect disparities in law enforcement practices, sentencing policies, and access to legal representation. The map provides a snapshot of how Latinx individuals are disproportionately affected by incarceration across different regions of the United States. Patterns may reveal states or regions with significantly higher or lower Latinx incarceration rates, highlighting areas where interventions such as community-based programs, policy reforms, and increased support for marginalized communities could be particularly impactful. Additionally, the map can serve as a tool for advocacy efforts aimed at addressing racial and ethnic disparities within the criminal justice system, ultimately contributing to the pursuit of equitable and just outcomes for all individuals.
 
-# Load the data
+Load the data
 url <- "https://github.com/melaniewalsh/Neat-Datasets/blob/main/us-prison-pop.csv?raw=true"
 prison_data <- read_csv(url) %>%
   clean_names()
 
-# Clean and filter the data
+Clean and filter the data
 prison_data <- prison_data %>%
   filter(!is.na(latinx_prison_pop) & !is.na(latinx_pop_15to64)) %>%
   mutate(latinx_incarceration_rate = (latinx_prison_pop / latinx_pop_15to64) * 100000)
 
-# Filter for the year 2016
+Filter for the year 2016
 prison_data_2016 <- prison_data %>%
   filter(year == 2016)
 
-# Aggregate data at the state level
+Aggregate data at the state level
 state_data <- prison_data_2016 %>%
   group_by(state) %>%
   summarise(latinx_incarceration_rate = mean(latinx_incarceration_rate, na.rm = TRUE))
 
-# Prepare data for mapping using ggplot2's map_data
+Prepare data for mapping using ggplot2's map_data
 state_map_data <- map_data("state")
 
-# Convert state names to lowercase for merging
+Convert state names to lowercase for merging
 state_data <- state_data %>%
   mutate(region = tolower(state.name[match(state, state.abb)]))
 
-# Merge map data with incarceration data
+Merge map data with incarceration data
 map_data <- state_map_data %>%
   left_join(state_data, by = "region")
 
-# Create the map
+Create the map
 map <- ggplot(map_data, aes(x = long, y = lat, group = group, fill = latinx_incarceration_rate)) +
   geom_polygon(color = "black") +
   scale_fill_gradientn(colors = c("lightblue", "blue"), na.value = "white", name = "Latinx Incarceration Rate\n(per 100,000 people)") +
@@ -227,7 +232,7 @@ map <- ggplot(map_data, aes(x = long, y = lat, group = group, fill = latinx_inca
   ggeasy::easy_center_title() +
   coord_fixed(1.3) # Use a map-based coordinate system to set the aspect ratio
 
-# Display the map
-print(map)
+Display the map
+print(map) 
 
 
