@@ -11,6 +11,8 @@ library(ggplot2)
 library(dplyr)
 library(leaflet)
 library(tidyr)
+library(sf)
+library(usmap)
 ```
 
 # **Introduction**
@@ -19,8 +21,6 @@ The United States has the highest incarceration rate in the world, significantly
 This report leverages data from the Vera Institute to examine these trends and disparities in U.S. incarceration rates. By focusing on variables such as jail population, time (year), and race, we aim to illuminate patterns of inequality and provide insights for potential policy interventions and public awareness initiatives.
 
 ## Description of the Variables
-
-In our analysis, we focus on the following key variables:
 
 ### Total Jail Population (total_jail_pop):
 
@@ -32,9 +32,9 @@ In our analysis, we focus on the following key variables:
 **Measure of Time**: The year variable indicates the specific year for which the jail population data is recorded.
 **Significance**: Examining trends over time allows us to observe how incarceration rates have evolved. This temporal analysis can reveal significant shifts in policy impacts or social dynamics affecting incarceration rates.
 
-### Race (e.g., black_jail_pop, white_jail_pop, hispanic_jail_pop):
+### Race (e.g., black_jail_pop, white_jail_pop):
 
-**Measure of Demographic Disparity**: These variables represent the jail populations broken down by racial groups: Black, White, and Hispanic.
+**Measure of Demographic Disparity**: These variables represent the jail populations broken down by racial groups: Black and White.
 **Significance**: Analyzing these variables is crucial for understanding racial disparities in incarceration rates. Given the historical and systemic nature of racial discrimination in the U.S., these variables highlight how different communities are affected by incarceration policies.
 
 ### State (state):
@@ -42,54 +42,166 @@ In our analysis, we focus on the following key variables:
 **Geographical Measure**: The state variable indicates the U.S. state for which the data is recorded.
 **Significance**: Analyzing data by state helps identify geographical variations in incarceration rates. State-specific policies and practices can significantly influence these rates, making this variable essential for a localized understanding of incarceration trends.
 
+# **Summary Information** 
+The analysis of the jail population data reveals several key insights into incarceration trends and racial disparities in the United States. Below are five relevant values calculated from the data:
 
-By focusing on these variables, this report provides a detailed analysis of incarceration trends, emphasizing the impact of race and geographical differences. This approach will help identify patterns and potential areas for intervention, addressing the inequalities within the U.S. criminal justice system. Through visualizations and data analysis, we strive to shed light on systemic issues and contribute to informed discussions on policy reforms.
+1. Average Jail Population Across Counties (2018)
+
+In 2018, the average jail population across all counties in the dataset was approximately 249 inmates. This average helps us understand the typical scale of incarceration at the county level during that year.
+
+jail_pop_2018 <- us_jail_pop_data %>% filter(year == 2018)
+
+average_jail_pop_2018 <- jail_pop_2018 %>% summarise(avg_jail_pop = mean(total_jail_pop, na.rm = TRUE))
+
+2. Highest Jail Population by County (2018)
+
+In 2018, Los Angeles County, California, had the highest jail population with 17,208 inmates. This highlights significant regional disparities, as some counties have disproportionately large incarcerated populations.
+
+highest_jail_pop_2018 <- jail_pop_2018 %>% filter(total_jail_pop == max(total_jail_pop, na.rm = TRUE))
+
+3. Lowest Jail Population by County (2018)
+
+Conversely, several counties, particularly rural ones, had very low or zero reported jail populations in 2018, indicating the vast differences in incarceration rates between urban and rural areas. Particulary, Keya Paha County in Nebraska had the lowest population of zero.
+
+lowest_jail_pop_2018 <- jail_pop_2018 %>% filter(total_jail_pop == min(total_jail_pop[total_jail_pop > 0], na.rm = TRUE))
+
+4. Change in Total Jail Population Over the Last 10 Years (2008-2018):
+
+From 2008 to 2018, the total jail population in the United States decreased by approximately 41,075 individuals. This decrease reflects recent efforts and policy changes aimed at reducing mass incarceration.
+
+total_jail_pop_by_year <- us_jail_pop_data %>% group_by(year) %>% summarise(total_jail_pop = sum(total_jail_pop, na.rm = TRUE))
+
+jail_pop_change <- total_jail_pop_by_year %>% filter(year %in% c(2008, 2018))
+jail_pop_change$change <- jail_pop_change$total_jail_pop - lag(jail_pop_change$total_jail_pop)
+
+5. Racial Disparities in Jail Population (2018):
+
+In 2018, Black Americans made up 33% of the total jail population, despite comprising only about 13.4% of the U.S. population. This stark disparity underscores the racial inequalities present within the U.S. criminal justice system.
+
+racial_disparities_2018 <- jail_pop_2018 %>% 
+  summarise(
+    total_black_jail_pop = sum(black_jail_pop, na.rm = TRUE),
+    total_white_jail_pop = sum(white_jail_pop, na.rm = TRUE),
+    total_jail_pop = sum(total_jail_pop, na.rm = TRUE)
+  )
+  
+racial_disparities_2018 <- racial_disparities_2018 %>%
+  mutate(
+    percent_black = (total_black_jail_pop / total_jail_pop) * 100,
+    percent_white = (total_white_jail_pop / total_jail_pop) * 100,
+  )
+
+
+# **Dataset Description**
+
+## Who collected the data?
+The data was collected by the Vera Institute of Justice, an organization known for its research and advocacy in criminal justice reform.
+
+## How was the data collected or generated?
+The data was aggregated from various sources, including government reports, official jail records, and administrative data from county and state correctional facilities. The Vera Institute compiled these records to create a unified dataset that reflects the jail populations at different times and across different jurisdictions.
+
+## Why was the data collected?
+The primary purpose of collecting this data was to shed light on the scope and scale of incarceration in the United States. By providing detailed information on jail populations, the Vera Institute aims to support research and advocacy efforts aimed at reducing mass incarceration and addressing systemic racial disparities in the justice system.
+
+## How many observations (rows) are in the data?
+The dataset contains approximately 153,811 observations (rows).
+
+nrow(us_jail_pop_data)
+
+## How Many Features (Columns) Are in the Data?
+The dataset includes 28 features (columns).
+
+## Ethical Questions or Questions of Power
+Working with this data requires careful consideration of ethical questions and power dynamics. Key issues include the potential for misuse of the data to reinforce negative stereotypes or justify punitive policies. It is also important to consider the privacy and rights of incarcerated individuals, as their data should be handled with sensitivity and confidentiality. Researchers must ensure that their analysis and interpretation do not inadvertently perpetuate biases or contribute to the stigmatization of marginalized communities.
+
+## Possible Limitations
+Some records may have missing or incomplete data, which can affect the accuracy and reliability of the analysis. Certain counties or states may have inconsistent reporting practices, leading to gaps in the data. Another limitation is the way racial and ethnic categories are defined and recorded as they may not capture the full complexity of individuals' identities. This can lead to oversimplified or misleading conclusions about racial disparities.
 
 
 # **Dataset**
 jail_pop_data <- read.csv("/Users/yoonseonam/Documents/Info201code/a4-incarceration-assignment-yseokul/us_jail_pop_data.csv")
 
 Number of records
-nrow(jail_pop_data)
+nrow(us_jail_pop_data)
 
 Column data
-str(jail_pop_data)
+str(us_jail_pop_data)
 
 
-# **Trend Analysis: Incarceration Rates Over Time**
+# **Trend Analysis: Jail Population Trends Over Time by Race**
 
-## Group populations by first variable
-yearly_inc_rates <- jail_pop_data %>%
-  group_by(year) %>%
-  summarise(total_jail_pop = sum(total_jail_pop, na.rm = TRUE))
+> This chart helps identify how the jail populations for different racial groups have changed over time. Patterns of racial disparities in incarceration rates can be observed, showing higher rates among marginalized communities compared to the White population. This trend analysis helps visualize the racial disparity as well as the stark contrasts in population differences.
 
-## Population trend analysis line chart 
-ggplot(yearly_inc_rates, aes(x = year, y = total_jail_pop)) +
-  geom_line() +
-  labs(title = "Total Jail Population Over Time", x = "Year", y = "Total Jail Population")
+race_data <- us_jail_pop_data %>%
+    group_by(year) %>%
+    summarise(
+        total_black_jail_pop = sum(black_jail_pop, na.rm = TRUE),
+        total_white_jail_pop = sum(white_jail_pop, na.rm = TRUE),
+        total_latinx_jail_pop = sum(latinx_jail_pop, na.rm = TRUE)
+    )
+
+race_data_long <- race_data %>%
+    pivot_longer(cols = c(total_black_jail_pop, total_white_jail_pop, total_latinx_jail_pop),
+                 names_to = "race",
+                 values_to = "total_jail_pop")
+
+ggplot(race_data_long, aes(x = year, y = total_jail_pop, color = race)) +
+    geom_line(size = 1) +
+    labs(
+        title = "Jail Population Trends Over Time by Race",
+        x = "Year",
+        y = "Total Jail Population",
+        color = "Racial Group"
+    ) +
+    scale_color_manual(
+        values = c("total_black_jail_pop" = "red", "total_white_jail_pop" = "blue", "total_latinx_jail_pop" = "green"),
+        labels = c("Black", "White", "Hispanic")
+    ) +
+    theme_minimal() +
+    theme(
+        plot.title = element_text(hjust = 0.5),
+        legend.title = element_text(hjust = 0.5)
+    )
+
   
-  
-# **Comparative Analysis: Jail Population By Race Over Time**
+# **Comparative Analysis: Relationship Between Total Jail Population and Black Jail Population*
 
-## Comparing jail population by race over time 
-race_data <- jail_pop_data %>%
-  select(year, black_jail_pop, white_jail_pop) %>%
-  group_by(year) %>%
-  summarise(
-    black_jail_pop = sum(black_jail_pop, na.rm = TRUE),
-    white_jail_pop = sum(white_jail_pop, na.rm = TRUE),
-) %>%
-pivot_longer(cols = -year, names_to = "race", values_to = "total_jail_pop")
+> The variable comparison chart, which compares the total jail population and the Black jail population using a scatter plot, was designed to reveal potential disparities in incarceration rates between the overall population and specific racial groups. There is a clear positive correlation, indicating that as the total jail population increases, the Black jail population also increases. This can highlight the proportional representation of Black individuals in the overall jail population.
 
-## Jail population trends by race comparative line chart
-ggplot(race_data, aes(x = year, y = total_jail_pop, color = race))
-  geom_line() +
-  labs(title = "Jail Population Trends by Race Over Time", x = "Year", y = "Total Jail Population")
+scatter_data <- jail_pop_2018 %>%
+    select(county_name, total_jail_pop, black_jail_pop) %>%
+    filter(!is.na(total_jail_pop) & !is.na(black_jail_pop))
+    
+ggplot(scatter_data, aes(x = total_jail_pop, y = black_jail_pop)) +
+    geom_point(alpha = 0.6, color = "blue") +
+    labs(
+        title = "Relationship Between Total Jail Population and Black Jail Population (2018)",
+        x = "Total Jail Population",
+        y = "Black Jail Population"
+    ) +
+    theme_minimal() +
+    theme(
+        plot.title = element_text(hjust = 0.5)
+    )
   
 # **Geographical Analysis:**
 
-## Organized data by state
-state_data <- jail_pop_data %>%
-  group_by(state) %>%
-  summarise(total_jail_pop = sum(total_jail_pop, na.rm = TRUE))
+> The geographic distribution map, which shows the total jail population by state, was designed to provide a spatial representation of incarceration rates across the United States. This visualization aims to highlight regional disparities and identify areas with particularly high or low jail populations. Certain states, especially those with larger urban populations, show darker shades, indicating higher total jail populations. This can point towards urban centers having higher incarceration rates.
 
+us_jail_pop_data <- us_jail_pop_data %>%
+  mutate(population_density = total_jail_pop / total_pop)
+  
+merged_data <- merge(map_usa, jail_pop_data, by.x = "region", by.y = "state", all.x = TRUE)
+
+ggplot() +
+  geom_polygon(data = map_data("state"), aes(x = long, y = lat, group = group, fill = jail_pop_data$population_density)) +
+  scale_fill_continuous(name = "Population Density", 
+                         low = "lightblue", 
+                         high = "darkblue", 
+                         na.value = "grey50") +
+  labs(
+    title = "Jail Population Density by State",
+    x = "Longitude",
+    y = "Latitude"
+  ) +
+  theme_minimal()
